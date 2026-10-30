@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart School Hub</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7ff}
+header{background:linear-gradient(135deg,#355cff,#6a5cff);color:#fff;padding:25px;text-align:center}
+nav{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:15px}
+button{padding:10px 15px;border:none;border-radius:10px;background:#355cff;color:#fff}
+.card{background:#fff;margin:15px;padding:15px;border-radius:15px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+input{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:8px}
+#list div{background:#eef2ff;padding:10px;margin-top:8px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Smart School Hub</h1>
+  <p>Padho • Seekho • Aage Badho</p>
+</header>
+
+<nav>
+  <button>Home</button>
+  <button>Notes</button>
+  <button>Homework</button>
+  <button>Quiz</button>
+</nav>
+
+<div class="card">
+  <h2>📝 Homework Tracker</h2>
+  <input id="task" placeholder="Homework ka naam">
+  <button onclick="addTask()">+ Add Homework</button>
+  <div id="list"></div>
+</div>
+
+<script>
+let tasks=JSON.parse(localStorage.getItem("tasks")||"[]");
+function render(){
+ document.getElementById("list").innerHTML="";
+ tasks.forEach((t,i)=>{
+  document.getElementById("list").innerHTML+=
+   `<div>${t} <button onclick="del(${i})">Delete</button></div>`;
+ });
+}
+function addTask(){
+ let t=document.getElementById("task").value.trim();
+ if(!t)return;
+ tasks.push(t);
+ localStorage.setItem("tasks",JSON.stringify(tasks));
+ document.getElementById("task").value="";
+ render();
+}
+function del(i){
+ tasks.splice(i,1);
+ localStorage.setItem("tasks",JSON.stringify(tasks));
+ render();
+}
+render();
+</script>
+
+</body>
+</html>
