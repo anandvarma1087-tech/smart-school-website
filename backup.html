@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart School Hub</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5ff;color:#202944}
+header{background:linear-gradient(135deg,#4438ca,#168bd5);color:white;padding:28px 18px;text-align:center;border-radius:0 0 25px 25px}
+header h1{margin:0;font-size:27px}
+header p{margin:9px 0 0}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px;background:white;position:sticky;top:0;z-index:5}
+nav a{background:#edf1ff;color:#3544a4;text-decoration:none;padding:10px 14px;border-radius:20px;white-space:nowrap;font-size:14px}
+main{max-width:850px;margin:auto;padding:14px}
+.card{background:white;margin:14px 0;padding:18px;border-radius:17px;box-shadow:0 4px 15px #1d2b5512}
+h2{font-size:20px;margin:0 0 14px;color:#3544a4}
+input,textarea,select{width:100%;padding:12px;border:1px solid #d8def0;border-radius:10px;margin:6px 0;font-size:15px}
+button{border:0;background:#4c48ce;color:white;padding:11px 15px;border-radius:10px;font-size:14px;margin:5px 3px;cursor:pointer}
+button.delete{background:#e74c60}
+.item{background:#f1f4ff;padding:12px;border-radius:10px;margin:9px 0;overflow-wrap:anywhere}
+.item button{float:right;margin-top:-3px}
+.small{color:#68718b;font-size:13px}
+.hero{background:linear-gradient(120deg,#e5eaff,#d9f4ff);padding:18px;border-radius:15px}
+footer{text-align:center;color:#75809b;padding:25px;font-size:13px}
+.quiz-option{display:block;width:100%;text-align:left;background:#edf1ff;color:#25356b}
+section{scroll-margin-top:70px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🎓 Smart School Hub</h1>
+<p>पढ़ो • सीखो • आगे बढ़ो</p>
+</header>
+
+<nav>
+<a href="#home">🏠 Home</a>
+<a href="#notes">📚 Notes</a>
+<a href="#homework">📝 Homework</a>
+<a href="#timetable">📅 Timetable</a>
+<a href="#quiz">🧠 Quiz</a>
+<a href="#notices">📢 Notices</a>
+</nav>
+
+<main>
+<section id="home" class="card">
+<div class="hero">
+<h2>नमस्ते विद्यार्थी! 👋</h2>
+<p>आपका अपना डिजिटल स्कूल पोर्टल। यहाँ पढ़ाई से जुड़ी सभी जरूरी चीजें एक जगह मिलेंगी।</p>
+</div>
+</section>
+
+<section id="notes" class="card">
+<h2>📚 My Notes</h2>
+<input id="noteTitle" placeholder="नोट का शीर्षक लिखें">
+<textarea id="noteText" rows="3" placeholder="अपने नोट्स यहाँ लिखें..."></textarea>
+<button onclick="addNote()">+ नोट सेव करें</button>
+<div id="notesList"></div>
+</section>
+
+<section id="homework" class="card">
+<h2>📝 Homework Tracker</h2>
+<input id="taskInput" placeholder="आज का होमवर्क लिखें">
+<button onclick="addTask()">+ होमवर्क जोड़ें</button>
+<div id="taskList"></div>
+</section>
+
+<section id="timetable" class="card">
+<h2>📅 Study Timetable</h2>
+<div class="item"><b>सोमवार</b> — हिंदी, अंग्रेजी, इतिहास</div>
+<div class="item"><b>मंगलवार</b> — अर्थशास्त्र, राजनीति विज्ञान</div>
+<div class="item"><b>बुधवार</b> — हिंदी, इतिहास, अंग्रेजी</div>
+<div class="item"><b>गुरुवार</b> — अर्थशास्त्र, राजनीति विज्ञान</div>
+<div class="item"><b>शुक्रवार</b> — अंग्रेजी, हिंदी, इतिहास</div>
+<div class="item"><b>शनिवार</b> — रिवीजन और टेस्ट</div>
+<p class="small">यह नमूना टाइमटेबल है। अपने स्कूल के अनुसार बदलाव कर सकते हैं।</p>
+</section>
+
+<section id="quiz" class="card">
+<h2>🧠 Knowledge Quiz</h2>
+<div id="quizArea">
+<p id="question"></p>
+<div id="options"></div>
+<p id="quizResult"></p>
+<button onclick="nextQuestion()" id="nextBtn">अगला सवाल</button>
+</div>
+</section>
+
+<section id="notices" class="card">
+<h2>📢 School Notices</h2>
+<input id="noticeInput" placeholder="नई सूचना लिखें">
+<button onclick="addNotice()">+ सूचना जोड़ें</button>
+<div id="noticeList"></div>
+</section>
+</main>
+
+<footer>© 2026 Smart School Hub | Learn Something New Every Day 🌟</footer>
+
+<script>
+function getData(key){
+ try{return JSON.parse(localStorage.getItem(key)) || []}
+ catch(e){return []}
+}
+function saveData(key,data){
+ localStorage.setItem(key,JSON.stringify(data));
+}
+
+let notes=getData("ssh_notes");
+let tasks=getData("ssh_tasks");
+let notices=getData("ssh_notices");
+
+function showNotes(){
+ document.getElementById("notesList").innerHTML="";
+ notes.forEach((n,i)=>{
+  let div=document.createElement("div");
+  div.className="item";
+  let b=document.createElement("b");
+  b.textContent=n.title;
+  let p=document.createElement("p");
+  p.textContent=n.text;
+  let btn=document.createElement("button");
+  btn.className="delete";
+  btn.textContent="हटाएँ";
+  btn.onclick=()=>{notes.splice(i,1);saveData("ssh_notes",notes);showNotes()};
+  div.append(b,p,btn);
+  document.getElementById("notesList").append(div);
+ });
+}
+function addNote(){
+ let title=document.getElementById("noteTitle").value.trim();
+ let text=document.getElementById("noteText").value.trim();
+ if(!title||!text){alert("शीर्षक और नोट दोनों लिखें");return}
+ notes.unshift({title,text});
+ saveData("ssh_notes",notes);
+ document.getElementById("noteTitle").value="";
+ document.getElementById("noteText").value="";
+ showNotes();
+}
+
+function showTasks(){
+ document.getElementById("taskList").innerHTML="";
+ tasks.forEach((t,i)=>{
+  let div=document.createElement("div");
+  div.className="item";
+  let span=document.createElement("span");
+  span.textContent=t;
+  let btn=document.createElement("button");
+  btn.className="delete";
+  btn.textContent="हटाएँ";
+  btn.onclick=()=>{tasks.splice(i,1);saveData("ssh_tasks",tasks);showTasks()};
+  div.append(span,btn);
+  document.getElementById("taskList").append(div);
+ });
+}
+function addTask(){
+ let val=document.getElementById("taskInput").value.trim();
+ if(!val)return;
+ tasks.push(val);
+ saveData("ssh_tasks",tasks);
+ document.getElementById("taskInput").value="";
+ showTasks();
+}
+
+function showNotices(){
+ document.getElementById("noticeList").innerHTML="";
+ notices.forEach((n,i)=>{
+  let div=document.createElement("div");
+  div.className="item";
+  let span=document.createElement("span");
+  span.textContent="📌 "+n;
+  let btn=document.createElement("button");
+  btn.className="delete";
+  btn.textContent="हटाएँ";
+  btn.onclick=()=>{notices.splice(i,1);saveData("ssh_notices",notices);showNotices()};
+  div.append(span,btn);
+  document.getElementById("noticeList").append(div);
+ });
+}
+function addNotice(){
+ let val=document.getElementById("noticeInput").value.trim();
+ if(!val)return;
+ notices.unshift(val);
+ saveData("ssh_notices",notices);
+ document.getElementById("noticeInput").value="";
+ showNotices();
+}
+
+const questions=[
+ {q:"भारत की राजधानी क्या है?",o:["मुंबई","नई दिल्ली","जयपुर"],a:1},
+ {q:"भारत का राष्ट्रीय पशु कौन है?",o:["शेर","हाथी","बाघ"],a:2},
+ {q:"एक सप्ताह में कितने दिन होते हैं?",o:["5","7","10"],a:1},
+ {q:"सूर्य किस दिशा से निकलता है?",o:["पूर्व","पश्चिम","उत्तर"],a:0},
+ {q:"भारत का राष्ट्रीय पक्षी कौन है?",o:["तोता","मोर","कबूतर"],a:1}
+];
+let qIndex=0,score=0,answered=false;
+
+function loadQuestion(){
+ answered=false;
+ document.getElementById("quizResult").textContent="";
+ document.getElementById("nextBtn").textContent="अगला सवाल";
+ let q=questions[qIndex];
+ document.getElementById("question").textContent=(qIndex+1)+". "+q.q;
+ let area=document.getElementById("options");
+ area.innerHTML="";
+ q.o.forEach((option,i)=>{
+  let btn=document.createElement("button");
+  btn.className="quiz-option";
+  btn.textContent=option;
+  btn.onclick=()=>checkAnswer(i);
+  area.append(btn);
+ });
+}
+function checkAnswer(i){
+ if(answered)return;
+ answered=true;
+ if(i===questions[qIndex].a){
+  score++;
+  document.getElementById("quizResult").textContent="✅ सही जवाब!";
+ }else{
+  document.getElementById("quizResult").textContent="❌ सही जवाब: "+questions[qIndex].o[questions[qIndex].a];
+ }
+}
+function nextQuestion(){
+ if(!answered){document.getElementById("quizResult").textContent="पहले एक जवाब चुनें।";return}
+ qIndex++;
+ if(qIndex>=questions.length){
+  document.getElementById("question").textContent="🎉 Quiz पूरा हुआ!";
+  document.getElementById("options").innerHTML="";
+  document.getElementById("quizResult").textContent="आपका स्कोर: "+score+"/"+questions.length;
+  document.getElementById("nextBtn").textContent="फिर से खेलें";
+  document.getElementById("nextBtn").onclick=resetQuiz;
+ }else loadQuestion();
+}
+function resetQuiz(){
+ qIndex=0;score=0;
+ document.getElementById("nextBtn").onclick=nextQuestion;
+ loadQuestion();
+}
+showNotes();
+showTasks();
+showNotices();
+loadQuestion();
+</script>
+</body>
+</html>
