@@ -243,5 +243,18 @@ showTasks();
 showNotices();
 loadQuestion();
 </script>
+<!-- Admin Panel -->
+<section class="card" id="adminPanel">
+  <h2>⚙️ Admin Panel</h2>
+  <p>Yahan se is browser ki School Notices manage kar sakte ho.</p>
+
+  <input id="adminNoticeInput" placeholder="नई सूचना लिखें">
+  <button onclick="
+    document.getElementById('noticeInput').value =
+    document.getElementById('adminNoticeInput').value;
+    addNotice();
+    document.getElementById('adminNoticeInput').value = '';
+  ">सूचना जोड़ें</button>
+</section>
 </body>
 </html>
